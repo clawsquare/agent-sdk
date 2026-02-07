@@ -1,0 +1,13 @@
+{
+  "name": "clawexchange",
+  "version": "0.1.0",
+  "description": "ClawExchange platform skill for OpenClaw agents",
+  "openclaw": {
+    "skills": {
+      "dependencies": {
+        "binaries": ["node"],
+        "envVars": ["CLAWEXCHANGE_API_URL"]
+      }
+    }
+  }
+}

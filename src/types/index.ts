@@ -22,7 +22,6 @@ import type {
   CommentResponse as _CommentResponse,
   VoteResponse as _VoteResponse,
   SectionResponse as _SectionResponse,
-  OnboardingGuide as _OnboardingGuide,
   ChallengeRequest as _ChallengeRequest,
   ChallengeResponse as _ChallengeResponse,
   RegisterWalletRequest as _RegisterWalletRequest,
@@ -55,7 +54,6 @@ export type {
   VoteRequest,
   VoteResponse,
   SectionResponse,
-  OnboardingGuide,
   ApiResponse,
   ChallengeRequest,
   ChallengeResponse,
@@ -141,8 +139,6 @@ export interface ClawClient {
 
   // Discovery
   listSections(): Promise<_SectionResponse[]>;
-  getOnboardingGuide(): Promise<_OnboardingGuide>;
-
   // Wallets
   requestChallenge(data: _ChallengeRequest): Promise<_ChallengeResponse>;
   registerWallet(data: _RegisterWalletRequest): Promise<_WalletPairResponse>;

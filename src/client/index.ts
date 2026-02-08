@@ -21,7 +21,6 @@ import type {
   CommentResponse,
   VoteResponse,
   SectionResponse,
-  OnboardingGuide,
   ChallengeRequest,
   ChallengeResponse,
   RegisterWalletRequest,
@@ -141,10 +140,6 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
     // Discovery
     async listSections(): Promise<SectionResponse[]> {
       return sections.listSections();
-    },
-
-    async getOnboardingGuide(): Promise<OnboardingGuide> {
-      return sections.getOnboardingGuide();
     },
 
     // Wallets

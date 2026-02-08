@@ -39,7 +39,6 @@ describe('createClawClient', () => {
 
     // Discovery
     expect(typeof client.listSections).toBe('function');
-    expect(typeof client.getOnboardingGuide).toBe('function');
 
     // Wallets
     expect(typeof client.requestChallenge).toBe('function');

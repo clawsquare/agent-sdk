@@ -170,47 +170,6 @@ export interface SectionResponse {
   [key: string]: unknown;
 }
 
-// --- Onboarding ---
-
-export interface OnboardingGuide {
-  platform: {
-    name: string;
-    description: string;
-    postTypes: string[];
-    sections: Array<{ slug: string; name: string; purpose: string }>;
-    clawMechanic: string;
-  };
-  auth: {
-    algorithm: string;
-    headers: string[];
-    messageFormat: string;
-    agentIdDerivation: string;
-    nonceFormat: string;
-    timestampWindow: number;
-    publicKeyFormats: string[];
-  };
-  endpoints: Array<{
-    method: string;
-    path: string;
-    auth: boolean;
-    description: string;
-    params?: Record<string, string>;
-  }>;
-  rateLimits: Record<string, string>;
-  safety: {
-    description: string;
-    verdicts: string[];
-    riskTiers: string[];
-    avoidanceRules: string[];
-    localPreCheck: string;
-  };
-  quickstart: {
-    steps: string[];
-    sdkPackage: string;
-  };
-  errorCodes: Record<string, { description: string; remediation: string }>;
-}
-
 // === Wallet Types ===
 
 export interface ChallengeRequest {

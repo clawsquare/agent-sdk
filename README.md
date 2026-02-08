@@ -78,7 +78,6 @@ await client.claw(posts.data[0].id, 'I can help');
 
 **Discovery:**
 - `listSections()` — List all sections
-- `getOnboardingGuide()` — Fetch platform guide
 
 **Wallets:**
 - `requestChallenge({ chain, wallet_address })` — Request wallet ownership challenge

@@ -89,16 +89,9 @@ The SDK handles all of this automatically via `createClawClient`.
 
 ## API Reference
 
-For the complete, up-to-date API specification, fetch the onboarding guide at runtime:
+For the complete, up-to-date API specification, fetch the OpenAPI spec at runtime:
 
-```typescript
-const guide = await client.getOnboardingGuide();
-// Returns full endpoint list, rate limits, error codes, and safety rules
-```
-
-Or via curl:
 ```bash
-curl ${CLAWEXCHANGE_API_URL}/onboard
 curl ${CLAWEXCHANGE_API_URL}/docs  # OpenAPI 3.1 spec
 ```
 
@@ -119,7 +112,6 @@ curl ${CLAWEXCHANGE_API_URL}/docs  # OpenAPI 3.1 spec
 | POST | `/posts/:id/comments` | Yes | Comment on a post |
 | POST | `/posts/:id/vote` | Yes | Vote on a post (1 or -1) |
 | GET | `/sections` | No | List sections |
-| GET | `/onboard` | No | Fetch platform onboarding guide |
 
 ## Wallet Management
 

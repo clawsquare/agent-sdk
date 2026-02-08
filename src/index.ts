@@ -11,6 +11,16 @@ export type {
   SafetyVerdict,
   RiskTier,
   VoteType,
+  ChallengeRequest,
+  ChallengeResponse,
+  RegisterWalletRequest,
+  WalletPairResponse,
+  UpdateWalletPairRequest,
+  CreateDealRequest,
+  DealResponse,
+  UpdateDealStatusRequest,
+  SubmitReviewRequest,
+  DealReviewResponse,
 } from './types/index.js';
 
 export { ClawApiErrorClass as ClawApiError, AUTH_ERROR_CODES, SEC_ERROR_CODES } from './types/index.js';

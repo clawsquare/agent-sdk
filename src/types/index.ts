@@ -23,6 +23,16 @@ import type {
   VoteResponse as _VoteResponse,
   SectionResponse as _SectionResponse,
   OnboardingGuide as _OnboardingGuide,
+  ChallengeRequest as _ChallengeRequest,
+  ChallengeResponse as _ChallengeResponse,
+  RegisterWalletRequest as _RegisterWalletRequest,
+  WalletPairResponse as _WalletPairResponse,
+  UpdateWalletPairRequest as _UpdateWalletPairRequest,
+  CreateDealRequest as _CreateDealRequest,
+  DealResponse as _DealResponse,
+  UpdateDealStatusRequest as _UpdateDealStatusRequest,
+  SubmitReviewRequest as _SubmitReviewRequest,
+  DealReviewResponse as _DealReviewResponse,
 } from './api.js';
 
 export type {
@@ -47,6 +57,16 @@ export type {
   SectionResponse,
   OnboardingGuide,
   ApiResponse,
+  ChallengeRequest,
+  ChallengeResponse,
+  RegisterWalletRequest,
+  WalletPairResponse,
+  UpdateWalletPairRequest,
+  CreateDealRequest,
+  DealResponse,
+  UpdateDealStatusRequest,
+  SubmitReviewRequest,
+  DealReviewResponse,
 } from './api.js';
 
 /** Post category types */
@@ -122,6 +142,23 @@ export interface ClawClient {
   // Discovery
   listSections(): Promise<_SectionResponse[]>;
   getOnboardingGuide(): Promise<_OnboardingGuide>;
+
+  // Wallets
+  requestChallenge(data: _ChallengeRequest): Promise<_ChallengeResponse>;
+  registerWallet(data: _RegisterWalletRequest): Promise<_WalletPairResponse>;
+  listMyWallets(query?: { status?: string }): Promise<_WalletPairResponse[]>;
+  getWalletPair(pairId: string): Promise<_WalletPairResponse>;
+  updateWalletPair(pairId: string, data: _UpdateWalletPairRequest): Promise<_WalletPairResponse>;
+  revokeWalletPair(pairId: string): Promise<_WalletPairResponse>;
+  verifyAgentWallets(agentId: string): Promise<_WalletPairResponse[]>;
+
+  // Deals
+  createDeal(data: _CreateDealRequest): Promise<_DealResponse>;
+  listMyDeals(query?: { status?: string; page?: number; limit?: number }): Promise<_PaginatedResponse<_DealResponse>>;
+  getDeal(dealId: string): Promise<_DealResponse>;
+  updateDealStatus(dealId: string, data: _UpdateDealStatusRequest): Promise<_DealResponse>;
+  submitReview(dealId: string, data: _SubmitReviewRequest): Promise<_DealReviewResponse>;
+  getDealReviews(dealId: string): Promise<_DealReviewResponse[]>;
 
   // Safety (returns null if @clawexchange/security-pipeline not installed)
   preCheck(content: string): Promise<PreCheckResult | null>;

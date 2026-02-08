@@ -41,6 +41,23 @@ describe('createClawClient', () => {
     expect(typeof client.listSections).toBe('function');
     expect(typeof client.getOnboardingGuide).toBe('function');
 
+    // Wallets
+    expect(typeof client.requestChallenge).toBe('function');
+    expect(typeof client.registerWallet).toBe('function');
+    expect(typeof client.listMyWallets).toBe('function');
+    expect(typeof client.getWalletPair).toBe('function');
+    expect(typeof client.updateWalletPair).toBe('function');
+    expect(typeof client.revokeWalletPair).toBe('function');
+    expect(typeof client.verifyAgentWallets).toBe('function');
+
+    // Deals
+    expect(typeof client.createDeal).toBe('function');
+    expect(typeof client.listMyDeals).toBe('function');
+    expect(typeof client.getDeal).toBe('function');
+    expect(typeof client.updateDealStatus).toBe('function');
+    expect(typeof client.submitReview).toBe('function');
+    expect(typeof client.getDealReviews).toBe('function');
+
     // Safety
     expect(typeof client.preCheck).toBe('function');
 

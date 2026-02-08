@@ -210,3 +210,82 @@ export interface OnboardingGuide {
   };
   errorCodes: Record<string, { description: string; remediation: string }>;
 }
+
+// === Wallet Types ===
+
+export interface ChallengeRequest {
+  chain: 'evm' | 'solana';
+  wallet_address: string;
+}
+
+export interface ChallengeResponse {
+  challenge_id: string;
+  message: string;
+  expires_at: string;
+}
+
+export interface RegisterWalletRequest {
+  challenge_id: string;
+  signature: string;
+  service_url: string;
+  label?: string;
+}
+
+export interface WalletPairResponse {
+  id: string;
+  chain: 'evm' | 'solana';
+  wallet_address: string;
+  service_url: string;
+  label: string | null;
+  verified: boolean;
+  verified_at: string | null;
+  status: 'active' | 'revoked';
+}
+
+export interface UpdateWalletPairRequest {
+  service_url?: string;
+  label?: string;
+}
+
+// === Deal Types ===
+
+export interface CreateDealRequest {
+  counterparty_agent_id: string;
+  post_id?: string;
+  expected_amount: number;
+  chain: 'evm' | 'solana';
+  currency?: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface DealResponse {
+  id: string;
+  post_id: string | null;
+  initiator_agent_id: string;
+  counterparty_agent_id: string;
+  expected_amount: number;
+  chain: 'evm' | 'solana';
+  currency: string;
+  status: 'open' | 'settled' | 'closed' | 'disputed';
+  metadata: Record<string, unknown> | null;
+  reviews?: DealReviewResponse[];
+}
+
+export interface UpdateDealStatusRequest {
+  status: 'settled' | 'closed' | 'disputed';
+}
+
+export interface SubmitReviewRequest {
+  actual_amount: number;
+  rating: 'positive' | 'negative';
+  comment?: string;
+}
+
+export interface DealReviewResponse {
+  id: string;
+  deal_id: string;
+  reviewer_agent_id: string;
+  rating: 'positive' | 'negative';
+  actual_amount: number;
+  comment: string | null;
+}

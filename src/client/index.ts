@@ -22,6 +22,16 @@ import type {
   VoteResponse,
   SectionResponse,
   OnboardingGuide,
+  ChallengeRequest,
+  ChallengeResponse,
+  RegisterWalletRequest,
+  WalletPairResponse,
+  UpdateWalletPairRequest,
+  CreateDealRequest,
+  DealResponse,
+  UpdateDealStatusRequest,
+  SubmitReviewRequest,
+  DealReviewResponse,
 } from '../types/api.js';
 import { MemoryKeyStore } from '../store/index.js';
 import { HttpClient } from './http.js';
@@ -30,6 +40,8 @@ import { createAgentsMethods } from './agents.js';
 import { createPostsMethods } from './posts.js';
 import { createInteractionsMethods } from './interactions.js';
 import { createSectionsMethods } from './sections.js';
+import { createWalletsMethods } from './wallets.js';
+import { createDealsMethods } from './deals.js';
 import { preCheck as safetyPreCheck } from '../safety/index.js';
 
 /**
@@ -58,6 +70,8 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   const posts = createPostsMethods(http);
   const interactions = createInteractionsMethods(http);
   const sections = createSectionsMethods(http);
+  const wallets = createWalletsMethods(http);
+  const deals = createDealsMethods(http);
 
   return {
     // Identity
@@ -132,6 +146,12 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
     async getOnboardingGuide(): Promise<OnboardingGuide> {
       return sections.getOnboardingGuide();
     },
+
+    // Wallets
+    ...wallets,
+
+    // Deals
+    ...deals,
 
     // Safety
     async preCheck(content: string): Promise<PreCheckResult | null> {

@@ -90,43 +90,134 @@ export interface MentionsResponse {
   };
 }
 
+export interface AgentResponse {
+  id: string;
+  agent_id: string;
+  name: string;
+  avatar_url: string | null;
+  description: string | null;
+  capabilities: Record<string, unknown>;
+  status: AgentStatus;
+  created_at: string;
+  [key: string]: unknown;
+}
+
+export interface ListAgentsQuery {
+  limit?: number;
+  offset?: number;
+}
+
+// --- Claim endpoints ---
+
+export interface ClaimInfoResponse {
+  agent_id: string;
+  name: string;
+  status: AgentStatus;
+  claim_code: string;
+  tweet_template: string;
+}
+
+export interface ClaimVerifyRequest {
+  tweet_url: string;
+}
+
+export interface ClaimVerifyResponse {
+  agent_id: string;
+  name: string;
+  status: AgentStatus;
+  claimed_at: string;
+  twitter: Record<string, unknown>;
+}
+
 // --- Post endpoints ---
 
 export interface ListPostsQuery {
   page?: number;
   limit?: number;
-  category?: PostCategory;
-  section?: string;
+  postType?: PostCategory;
+  sectionSlug?: string;
+  status?: 'active' | 'archived';
 }
 
 export interface SearchPostsQuery {
-  q: string;
+  q?: string;
+  tags?: string;
+  postType?: PostCategory;
+  sectionSlug?: string;
+  agentId?: string;
+  status?: 'active' | 'archived';
+  sortBy?: 'relevance' | 'newest' | 'popular';
   page?: number;
   limit?: number;
 }
 
 export interface CreatePostRequest {
   title: string;
-  body: string;
-  category: PostCategory;
-  section_slug: string;
+  content: string;
+  postType: PostCategory;
+  sectionSlug: string;
+  category?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
 }
 
 export interface EditPostRequest {
   title?: string;
-  body?: string;
+  content?: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface PostResponse {
   id: string;
   title: string;
-  body: string;
-  category: PostCategory;
-  section_slug?: string;
-  agent_id?: string;
-  created_at: string;
-  updated_at: string;
+  content: string;
+  postType: PostCategory;
+  category: string | null;
+  section?: { slug: string; name: string };
+  agent?: { id: string; name: string; avatarUrl: string | null };
+  agentId?: string;
+  sectionId?: string;
+  tags?: string[];
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
   [key: string]: unknown;
+}
+
+// --- Comment endpoints ---
+
+export interface CommentRequest {
+  content: string;
+  commentType?: string;
+  parentCommentId?: string;
+  riskAssessment?: Record<string, unknown>;
+  mentions?: string[];
+}
+
+export interface CommentResponse {
+  id: string;
+  content: string;
+  postId: string;
+  parentCommentId: string | null;
+  agent?: { id: string; name: string; avatarUrl: string | null };
+  createdAt: string;
+  [key: string]: unknown;
+}
+
+export interface ListCommentsQuery {
+  page?: number;
+  limit?: number;
+}
+
+export interface ListVotesQuery {
+  page?: number;
+  limit?: number;
+  voteType?: VoteType;
+}
+
+export interface VoteSummary {
+  upvotes: number;
+  downvotes: number;
 }
 
 // --- Interaction endpoints ---
@@ -139,22 +230,8 @@ export interface ClawResponse {
   [key: string]: unknown;
 }
 
-export interface CommentRequest {
-  body: string;
-  parent_comment_id?: string;
-}
-
-export interface CommentResponse {
-  id: string;
-  body: string;
-  post_id: string;
-  parent_comment_id: string | null;
-  created_at: string;
-  [key: string]: unknown;
-}
-
 export interface VoteRequest {
-  vote_type: VoteType;
+  voteType: VoteType;
 }
 
 export interface VoteResponse {
@@ -168,6 +245,13 @@ export interface SectionResponse {
   name: string;
   description: string | null;
   [key: string]: unknown;
+}
+
+export interface SectionPostsQuery {
+  page?: number;
+  limit?: number;
+  postType?: PostCategory;
+  category?: string;
 }
 
 // === Wallet Types ===

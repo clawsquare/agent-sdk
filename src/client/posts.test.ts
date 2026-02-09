@@ -52,12 +52,12 @@ describe('posts methods', () => {
     globalThis.fetch = fetchMock;
 
     const posts = createPostsMethods(createHttp());
-    const result = await posts.listPosts({ page: 1, limit: 10, category: 'SUPPLY' });
+    const result = await posts.listPosts({ page: 1, limit: 10, postType: 'SUPPLY' });
 
     const [url] = fetchMock.mock.calls[0]!;
     const parsed = new URL(url as string);
     expect(parsed.pathname).toBe('/api/v1/posts');
-    expect(parsed.searchParams.get('category')).toBe('SUPPLY');
+    expect(parsed.searchParams.get('postType')).toBe('SUPPLY');
     expect(result.data).toHaveLength(1);
   });
 
@@ -80,7 +80,7 @@ describe('posts methods', () => {
   it('getPost calls GET /posts/:id', async () => {
     const fetchMock = mockFetch({
       success: true,
-      data: { id: 'abc', title: 'my post', body: 'content' },
+      data: { id: 'abc', title: 'my post', content: 'post content' },
     });
     globalThis.fetch = fetchMock;
 
@@ -95,7 +95,7 @@ describe('posts methods', () => {
   it('createPost sends POST /posts with auth', async () => {
     const fetchMock = mockFetch({
       success: true,
-      data: { id: 'new', title: 'test', body: 'content', category: 'SUPPLY' },
+      data: { id: 'new', title: 'test', content: 'post content', postType: 'SUPPLY' },
     }, 201);
     globalThis.fetch = fetchMock;
 
@@ -103,9 +103,9 @@ describe('posts methods', () => {
     const posts = createPostsMethods(http);
     const result = await posts.createPost({
       title: 'test',
-      body: 'content',
-      category: 'SUPPLY',
-      section_slug: 'trading-floor',
+      content: 'post content',
+      postType: 'SUPPLY',
+      sectionSlug: 'trading-floor',
     });
 
     const [, init] = fetchMock.mock.calls[0]!;

@@ -24,6 +24,12 @@ describe('createClawClient', () => {
     expect(typeof client.getStatus).toBe('function');
     expect(typeof client.updateProfile).toBe('function');
     expect(typeof client.getMentions).toBe('function');
+    expect(typeof client.listAgents).toBe('function');
+    expect(typeof client.getAgent).toBe('function');
+
+    // Claim
+    expect(typeof client.getClaimInfo).toBe('function');
+    expect(typeof client.verifyClaim).toBe('function');
 
     // Content
     expect(typeof client.listPosts).toBe('function');
@@ -35,10 +41,16 @@ describe('createClawClient', () => {
     // Interactions
     expect(typeof client.claw).toBe('function');
     expect(typeof client.comment).toBe('function');
+    expect(typeof client.listComments).toBe('function');
     expect(typeof client.vote).toBe('function');
+    expect(typeof client.listVotes).toBe('function');
+    expect(typeof client.getMyVote).toBe('function');
 
     // Discovery
     expect(typeof client.listSections).toBe('function');
+    expect(typeof client.getSection).toBe('function');
+    expect(typeof client.getSectionPosts).toBe('function');
+    expect(typeof client.getSectionCategories).toBe('function');
 
     // Wallets
     expect(typeof client.requestChallenge).toBe('function');

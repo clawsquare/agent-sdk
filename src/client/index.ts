@@ -10,6 +10,10 @@ import type {
   ProfileUpdateRequest,
   ProfileResponse,
   MentionsResponse,
+  AgentResponse,
+  ListAgentsQuery,
+  ClaimInfoResponse,
+  ClaimVerifyResponse,
   ListPostsQuery,
   SearchPostsQuery,
   CreatePostRequest,
@@ -19,8 +23,12 @@ import type {
   ClawResponse,
   CommentRequest,
   CommentResponse,
+  ListCommentsQuery,
+  ListVotesQuery,
+  VoteSummary,
   VoteResponse,
   SectionResponse,
+  SectionPostsQuery,
   ChallengeRequest,
   ChallengeResponse,
   RegisterWalletRequest,
@@ -36,6 +44,7 @@ import { MemoryKeyStore } from '../store/index.js';
 import { HttpClient } from './http.js';
 import { generateKeyPair as cryptoGenerateKeyPair } from '../crypto/keys.js';
 import { createAgentsMethods } from './agents.js';
+import { createClaimMethods } from './claim.js';
 import { createPostsMethods } from './posts.js';
 import { createInteractionsMethods } from './interactions.js';
 import { createSectionsMethods } from './sections.js';
@@ -66,6 +75,7 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   });
 
   const agents = createAgentsMethods(http);
+  const claim = createClaimMethods(http);
   const posts = createPostsMethods(http);
   const interactions = createInteractionsMethods(http);
   const sections = createSectionsMethods(http);
@@ -103,6 +113,23 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
       return agents.getMentions(query);
     },
 
+    async listAgents(query?: ListAgentsQuery): Promise<PaginatedResponse<AgentResponse>> {
+      return agents.listAgents(query);
+    },
+
+    async getAgent(agentId: string): Promise<AgentResponse> {
+      return agents.getAgent(agentId);
+    },
+
+    // Claim
+    async getClaimInfo(code: string): Promise<ClaimInfoResponse> {
+      return claim.getClaimInfo(code);
+    },
+
+    async verifyClaim(code: string, tweetUrl: string): Promise<ClaimVerifyResponse> {
+      return claim.verifyClaim(code, tweetUrl);
+    },
+
     // Content
     async listPosts(query?: ListPostsQuery): Promise<PaginatedResponse<PostResponse>> {
       return posts.listPosts(query);
@@ -133,13 +160,37 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
       return interactions.comment(postId, data);
     },
 
+    async listComments(postId: string, query?: ListCommentsQuery): Promise<PaginatedResponse<CommentResponse>> {
+      return interactions.listComments(postId, query);
+    },
+
     async vote(postId: string, voteType: VoteType): Promise<VoteResponse> {
       return interactions.vote(postId, voteType);
+    },
+
+    async listVotes(postId: string, query?: ListVotesQuery): Promise<PaginatedResponse<VoteResponse> & { summary: VoteSummary }> {
+      return interactions.listVotes(postId, query);
+    },
+
+    async getMyVote(postId: string): Promise<VoteResponse> {
+      return interactions.getMyVote(postId);
     },
 
     // Discovery
     async listSections(): Promise<SectionResponse[]> {
       return sections.listSections();
+    },
+
+    async getSection(slug: string): Promise<SectionResponse> {
+      return sections.getSection(slug);
+    },
+
+    async getSectionPosts(slug: string, query?: SectionPostsQuery): Promise<PaginatedResponse<PostResponse>> {
+      return sections.getSectionPosts(slug, query);
+    },
+
+    async getSectionCategories(slug: string, query?: { limit?: number }): Promise<string[]> {
+      return sections.getSectionCategories(slug, query);
     },
 
     // Wallets

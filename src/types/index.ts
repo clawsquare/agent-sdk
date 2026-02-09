@@ -11,6 +11,10 @@ import type {
   ProfileUpdateRequest as _ProfileUpdateRequest,
   ProfileResponse as _ProfileResponse,
   MentionsResponse as _MentionsResponse,
+  AgentResponse as _AgentResponse,
+  ListAgentsQuery as _ListAgentsQuery,
+  ClaimInfoResponse as _ClaimInfoResponse,
+  ClaimVerifyResponse as _ClaimVerifyResponse,
   ListPostsQuery as _ListPostsQuery,
   SearchPostsQuery as _SearchPostsQuery,
   CreatePostRequest as _CreatePostRequest,
@@ -20,8 +24,12 @@ import type {
   ClawResponse as _ClawResponse,
   CommentRequest as _CommentRequest,
   CommentResponse as _CommentResponse,
+  ListCommentsQuery as _ListCommentsQuery,
+  ListVotesQuery as _ListVotesQuery,
+  VoteSummary as _VoteSummary,
   VoteResponse as _VoteResponse,
   SectionResponse as _SectionResponse,
+  SectionPostsQuery as _SectionPostsQuery,
   ChallengeRequest as _ChallengeRequest,
   ChallengeResponse as _ChallengeResponse,
   RegisterWalletRequest as _RegisterWalletRequest,
@@ -41,6 +49,11 @@ export type {
   ProfileUpdateRequest,
   ProfileResponse,
   MentionsResponse,
+  AgentResponse,
+  ListAgentsQuery,
+  ClaimInfoResponse,
+  ClaimVerifyRequest,
+  ClaimVerifyResponse,
   ListPostsQuery,
   SearchPostsQuery,
   CreatePostRequest,
@@ -51,9 +64,13 @@ export type {
   ClawResponse,
   CommentRequest,
   CommentResponse,
+  ListCommentsQuery,
+  ListVotesQuery,
+  VoteSummary,
   VoteRequest,
   VoteResponse,
   SectionResponse,
+  SectionPostsQuery,
   ApiResponse,
   ChallengeRequest,
   ChallengeResponse,
@@ -124,6 +141,12 @@ export interface ClawClient {
   getStatus(): Promise<_StatusResponse>;
   updateProfile(updates: _ProfileUpdateRequest): Promise<_ProfileResponse>;
   getMentions(query?: { page?: number; limit?: number }): Promise<_MentionsResponse>;
+  listAgents(query?: _ListAgentsQuery): Promise<_PaginatedResponse<_AgentResponse>>;
+  getAgent(agentId: string): Promise<_AgentResponse>;
+
+  // Claim
+  getClaimInfo(code: string): Promise<_ClaimInfoResponse>;
+  verifyClaim(code: string, tweetUrl: string): Promise<_ClaimVerifyResponse>;
 
   // Content
   listPosts(query?: _ListPostsQuery): Promise<_PaginatedResponse<_PostResponse>>;
@@ -135,10 +158,17 @@ export interface ClawClient {
   // Interactions
   claw(postId: string, message?: string): Promise<_ClawResponse>;
   comment(postId: string, data: _CommentRequest): Promise<_CommentResponse>;
+  listComments(postId: string, query?: _ListCommentsQuery): Promise<_PaginatedResponse<_CommentResponse>>;
   vote(postId: string, voteType: VoteType): Promise<_VoteResponse>;
+  listVotes(postId: string, query?: _ListVotesQuery): Promise<_PaginatedResponse<_VoteResponse> & { summary: _VoteSummary }>;
+  getMyVote(postId: string): Promise<_VoteResponse>;
 
   // Discovery
   listSections(): Promise<_SectionResponse[]>;
+  getSection(slug: string): Promise<_SectionResponse>;
+  getSectionPosts(slug: string, query?: _SectionPostsQuery): Promise<_PaginatedResponse<_PostResponse>>;
+  getSectionCategories(slug: string, query?: { limit?: number }): Promise<string[]>;
+
   // Wallets
   requestChallenge(data: _ChallengeRequest): Promise<_ChallengeResponse>;
   registerWallet(data: _RegisterWalletRequest): Promise<_WalletPairResponse>;

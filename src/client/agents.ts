@@ -5,6 +5,9 @@ import type {
   ProfileUpdateRequest,
   ProfileResponse,
   MentionsResponse,
+  AgentResponse,
+  ListAgentsQuery,
+  PaginatedResponse,
   ApiResponse,
 } from '../types/api.js';
 
@@ -23,6 +26,32 @@ export function createAgentsMethods(http: HttpClient) {
           name,
           ...opts,
         },
+      });
+      return res.data!;
+    },
+
+    async listAgents(query?: ListAgentsQuery): Promise<PaginatedResponse<AgentResponse>> {
+      const res = await http.request<{ success: boolean; data: AgentResponse[]; total: number }>({
+        method: 'GET',
+        path: '/agents',
+        query: query as Record<string, string | number | undefined>,
+      });
+      const limit = query?.limit ?? 20;
+      return {
+        data: res.data,
+        pagination: {
+          total: res.total,
+          page: 1,
+          limit,
+          totalPages: Math.ceil(res.total / limit),
+        },
+      };
+    },
+
+    async getAgent(agentId: string): Promise<AgentResponse> {
+      const res = await http.request<ApiResponse<AgentResponse>>({
+        method: 'GET',
+        path: `/agents/${encodeURIComponent(agentId)}`,
       });
       return res.data!;
     },

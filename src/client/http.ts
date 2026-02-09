@@ -28,10 +28,6 @@ export class HttpClient {
 
   async request<T = Record<string, unknown>>(opts: RequestOptions): Promise<T> {
     const url = this.buildUrl(opts.path, opts.query);
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
 
     // Serialize body once — same string used for both signing and fetch body
     let bodyString: string | undefined;
@@ -39,38 +35,47 @@ export class HttpClient {
       bodyString = JSON.stringify(opts.body);
     }
 
-    // Add auth headers if required
-    if (opts.auth) {
-      const privateKey = await this.config.keyStore.getPrivateKey();
-      const agentId = await this.config.keyStore.getAgentId();
+    // Build a function that creates fresh headers (with new nonce/timestamp) on each call
+    const buildInit = async (): Promise<RequestInit> => {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
-      if (!privateKey || !agentId) {
-        throw new ClawApiError(0, 'SDK_NO_KEYS', 'No keys stored. Call generateKeys() first.');
+      if (opts.auth) {
+        const privateKey = await this.config.keyStore.getPrivateKey();
+        const agentId = await this.config.keyStore.getAgentId();
+
+        if (!privateKey || !agentId) {
+          throw new ClawApiError(0, 'SDK_NO_KEYS', 'No keys stored. Call generateKeys() first.');
+        }
+
+        const signBody = bodyString ?? '{}';
+        const clawHeaders = buildClawHeaders(signBody, agentId, privateKey, this.config.manifestHash);
+        Object.assign(headers, clawHeaders);
       }
 
-      // For GET requests, sign with "{}" as body
-      const signBody = bodyString ?? '{}';
-      const clawHeaders = buildClawHeaders(signBody, agentId, privateKey, this.config.manifestHash);
-      Object.assign(headers, clawHeaders);
-    }
+      return {
+        method: opts.method,
+        headers,
+        body: bodyString,
+        signal: AbortSignal.timeout(this.config.requestTimeoutMs),
+      };
+    };
 
-    return this.executeWithRetry<T>(url, {
-      method: opts.method,
-      headers,
-      body: bodyString,
-      signal: AbortSignal.timeout(this.config.requestTimeoutMs),
-    });
+    return this.executeWithRetry<T>(url, buildInit);
   }
 
-  private async executeWithRetry<T>(url: string, init: RequestInit, attempt = 0): Promise<T> {
+  private async executeWithRetry<T>(url: string, buildInit: () => Promise<RequestInit>, attempt = 0): Promise<T> {
+    const init = await buildInit();
     const res = await fetch(url, init);
 
-    // Handle 429 rate limiting with retry
+    // Handle 429 rate limiting with retry (regenerates nonce via buildInit)
     if (res.status === 429 && this.config.retryOnRateLimit && attempt < this.config.maxRetries) {
       const retryAfter = res.headers.get('Retry-After');
       const waitMs = retryAfter ? parseInt(retryAfter, 10) * 1000 : 1000;
       await new Promise(resolve => setTimeout(resolve, waitMs));
-      return this.executeWithRetry<T>(url, init, attempt + 1);
+      return this.executeWithRetry<T>(url, buildInit, attempt + 1);
     }
 
     const json = await res.json() as Record<string, unknown>;

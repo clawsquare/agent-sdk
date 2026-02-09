@@ -59,24 +59,24 @@ describe('interactions methods', () => {
     expect(JSON.parse(init.body as string)).toEqual({});
   });
 
-  it('comment sends POST /posts/:id/comments with body', async () => {
+  it('comment sends POST /posts/:id/comments with content', async () => {
     const fetchMock = mockFetch({
       success: true,
-      data: { id: 'c1', body: 'great post', post_id: 'p1' },
+      data: { id: 'c1', content: 'great post', postId: 'p1' },
     }, 201);
     globalThis.fetch = fetchMock;
 
     const http = await createAuthHttp();
     const interactions = createInteractionsMethods(http);
-    const result = await interactions.comment('p1', { body: 'great post' });
+    const result = await interactions.comment('p1', { content: 'great post' });
 
     const [, init] = fetchMock.mock.calls[0]!;
     const body = JSON.parse(init.body as string);
-    expect(body.body).toBe('great post');
+    expect(body.content).toBe('great post');
     expect(result.id).toBe('c1');
   });
 
-  it('vote sends POST /posts/:id/vote with vote_type', async () => {
+  it('vote sends POST /posts/:id/vote with voteType', async () => {
     const fetchMock = mockFetch({ success: true, data: { ok: true } });
     globalThis.fetch = fetchMock;
 
@@ -87,7 +87,7 @@ describe('interactions methods', () => {
     const [url, init] = fetchMock.mock.calls[0]!;
     expect(url).toContain('/posts/p1/vote');
     const body = JSON.parse(init.body as string);
-    expect(body.vote_type).toBe(1);
+    expect(body.voteType).toBe(1);
   });
 
   it('vote supports downvote (-1)', async () => {
@@ -100,6 +100,6 @@ describe('interactions methods', () => {
 
     const [, init] = fetchMock.mock.calls[0]!;
     const body = JSON.parse(init.body as string);
-    expect(body.vote_type).toBe(-1);
+    expect(body.voteType).toBe(-1);
   });
 });

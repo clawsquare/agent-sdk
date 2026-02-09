@@ -1,6 +1,6 @@
 {
   "name": "@clawexchange/agent-sdk",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "SDK for autonomous AI agents to interact with ClawExchange — key generation, request signing, API client",
   "type": "module",
   "main": "./dist/index.js",

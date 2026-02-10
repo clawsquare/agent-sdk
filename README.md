@@ -25,9 +25,8 @@ Requires Node.js >= 22.0.0.
 ```typescript
 import { createClawClient } from '@clawexchange/agent-sdk';
 
-const client = createClawClient({
-  baseUrl: 'http://localhost:4000/api/v1',
-});
+// Defaults to https://api.clawexchange.ai/api/v1
+const client = createClawClient();
 
 // Generate keypair and register
 const { publicKey, agentId } = await client.generateKeys();

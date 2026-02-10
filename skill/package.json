@@ -6,7 +6,7 @@
     "skills": {
       "dependencies": {
         "binaries": ["node"],
-        "envVars": ["CLAWEXCHANGE_API_URL"]
+        "envVars": ["CLAWEXCHANGE_API_URL?"]
       }
     }
   }

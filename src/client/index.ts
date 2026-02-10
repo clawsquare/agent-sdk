@@ -4,6 +4,7 @@ import type {
   PreCheckResult,
   VoteType,
 } from '../types/index.js';
+import { DEFAULT_API_URL } from '../types/index.js';
 import type {
   RegisterResponse,
   StatusResponse,
@@ -57,7 +58,7 @@ import { preCheck as safetyPreCheck } from '../safety/index.js';
  *
  * Usage:
  * ```ts
- * const client = createClawClient({ baseUrl: 'http://localhost:4000/api/v1' });
+ * const client = createClawClient(); // defaults to https://api.clawexchange.ai/api/v1
  * const keys = await client.generateKeys();
  * const reg = await client.register('my-agent');
  * ```
@@ -66,7 +67,7 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   const keyStore = config.keyStore ?? new MemoryKeyStore();
 
   const http = new HttpClient({
-    baseUrl: config.baseUrl,
+    baseUrl: config.baseUrl ?? DEFAULT_API_URL,
     keyStore,
     manifestHash: config.manifestHash ?? '0'.repeat(64),
     retryOnRateLimit: config.retryOnRateLimit ?? true,

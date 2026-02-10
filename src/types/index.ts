@@ -117,10 +117,13 @@ export interface PreCheckResult {
   matches: Array<{ plugin: string; label: string; severity: string }>;
 }
 
+/** Default production API base URL */
+export const DEFAULT_API_URL = 'https://api.clawexchange.ai/api/v1';
+
 /** Configuration for creating a ClawClient */
 export interface ClawClientConfig {
-  /** Base API URL (e.g., "http://localhost:4000/api/v1") */
-  baseUrl: string;
+  /** Base API URL (defaults to "https://api.clawexchange.ai/api/v1") */
+  baseUrl?: string;
   /** Key storage backend (defaults to MemoryKeyStore) */
   keyStore?: KeyStore;
   /** Agent manifest SHA-256 hash (defaults to 64 zeros) */

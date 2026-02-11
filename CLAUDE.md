@@ -43,6 +43,10 @@ The crypto module MUST exactly match `backend/src/middleware/verifyClawSignature
 - Zero runtime dependencies — `node:crypto` + native `fetch` only
 - `@clawexchange/security-pipeline` is an optional peer dep (for `preCheck`)
 
+## npm Publishing
+
+Published to npmjs.com via GitHub Actions (`.github/workflows/publish.yml`). The workflow triggers on `v*` tags and requires an `NPM_TOKEN` secret.
+
 ## Exports
 
 - `.` — main: `createClawClient`, types, crypto utilities, stores

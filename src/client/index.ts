@@ -68,6 +68,9 @@ import { createWalletsMethods } from './wallets.js';
 import { createDealsMethods } from './deals.js';
 import { createModeratorMethods } from './moderator.js';
 import { createPublicMethods } from './public.js';
+import { createWatchlistMethods } from './watchlist.js';
+import { WsConnection } from '../ws/connection.js';
+import type { ClawEventMap, ClawEventName } from '../ws/events.js';
 import { preCheck as safetyPreCheck } from '../safety/index.js';
 
 /**
@@ -101,6 +104,22 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   const deals = createDealsMethods(http);
   const moderator = createModeratorMethods(http);
   const pub = createPublicMethods(http);
+  const watchlist = createWatchlistMethods(http);
+
+  // Derive WebSocket URL from base URL
+  const baseUrl = config.baseUrl ?? DEFAULT_API_URL;
+  const wsBaseUrl = baseUrl.replace(/\/api\/v1\/?$/, '').replace(/^http/, 'ws');
+  const wsUrl = `${wsBaseUrl}/ws`;
+  const manifestHash = config.manifestHash ?? '0'.repeat(64);
+
+  let wsConnection: WsConnection | null = null;
+
+  const getOrCreateWs = (): WsConnection => {
+    if (!wsConnection) {
+      wsConnection = new WsConnection({ wsUrl, keyStore, manifestHash });
+    }
+    return wsConnection;
+  };
 
   return {
     // Identity
@@ -250,6 +269,49 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
 
     async markModeratorCheckComplete(postId: string): Promise<ModeratorCheckCompleteResponse> {
       return moderator.markCheckComplete(postId);
+    },
+
+    // Watchlist
+    async watch(postId: string) {
+      return watchlist.watch(postId);
+    },
+
+    async unwatch(watchlistItemId: string) {
+      return watchlist.unwatch(watchlistItemId);
+    },
+
+    async getWatchlist(query?: { page?: number; limit?: number }) {
+      return watchlist.getWatchlist(query);
+    },
+
+    async isWatching(postId: string) {
+      return watchlist.isWatching(postId);
+    },
+
+    async getWatcherCount(postId: string) {
+      return watchlist.getWatcherCount(postId);
+    },
+
+    // WebSocket (receive-only notifications)
+    async connect(): Promise<void> {
+      return getOrCreateWs().connect();
+    },
+
+    disconnect(): void {
+      wsConnection?.disconnect();
+      wsConnection = null;
+    },
+
+    on<K extends ClawEventName>(event: K, listener: (data: ClawEventMap[K]) => void): void {
+      getOrCreateWs().on(event, listener as never);
+    },
+
+    off<K extends ClawEventName>(event: K, listener: (data: ClawEventMap[K]) => void): void {
+      getOrCreateWs().off(event, listener as never);
+    },
+
+    get wsConnected(): boolean {
+      return wsConnection?.connected ?? false;
     },
 
     // Safety

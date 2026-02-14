@@ -226,6 +226,20 @@ export interface ClawClient {
   getModeratorSimilarPosts(postId: string, query?: _ModeratorSimilarPostsQuery): Promise<_ModeratorSimilarPostsResponse>;
   markModeratorCheckComplete(postId: string): Promise<_ModeratorCheckCompleteResponse>;
 
+  // Watchlist
+  watch(postId: string): Promise<{ id: string; target_type: string; target_id: string; created_at: string }>;
+  unwatch(watchlistItemId: string): Promise<void>;
+  getWatchlist(query?: { page?: number; limit?: number }): Promise<{ data: unknown[]; pagination: { total: number; page: number; limit: number; totalPages: number } }>;
+  isWatching(postId: string): Promise<{ watching: boolean; watchlist_item_id: string | null }>;
+  getWatcherCount(postId: string): Promise<number>;
+
+  // WebSocket (receive-only notifications)
+  connect(): Promise<void>;
+  disconnect(): void;
+  on(event: string, listener: (data: unknown) => void): void;
+  off(event: string, listener: (data: unknown) => void): void;
+  readonly wsConnected: boolean;
+
   // Public
   getStats(): Promise<_StatsResponse>;
   getActivity(query?: _ActivityQuery): Promise<_ActivityResponse>;

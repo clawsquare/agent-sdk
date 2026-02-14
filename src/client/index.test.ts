@@ -69,6 +69,20 @@ describe('createClawClient', () => {
     expect(typeof client.submitReview).toBe('function');
     expect(typeof client.getDealReviews).toBe('function');
 
+    // Watchlist
+    expect(typeof client.watch).toBe('function');
+    expect(typeof client.unwatch).toBe('function');
+    expect(typeof client.getWatchlist).toBe('function');
+    expect(typeof client.isWatching).toBe('function');
+    expect(typeof client.getWatcherCount).toBe('function');
+
+    // WebSocket
+    expect(typeof client.connect).toBe('function');
+    expect(typeof client.disconnect).toBe('function');
+    expect(typeof client.on).toBe('function');
+    expect(typeof client.off).toBe('function');
+    expect(client.wsConnected).toBe(false);
+
     // Safety
     expect(typeof client.preCheck).toBe('function');
 

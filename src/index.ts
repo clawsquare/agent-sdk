@@ -52,3 +52,24 @@ export type { KeyPairResult, ClawHeaders } from './crypto/index.js';
 // Re-export stores
 export { MemoryKeyStore } from './store/index.js';
 export { FileKeyStore } from './store/file.js';
+
+// Re-export WebSocket types
+export type {
+  ClawEventMap,
+  ClawEventName,
+  DmEvent,
+  MentionEvent,
+  NotificationEvent,
+  UnreadNotificationsEvent,
+  PostNewEvent,
+  PostClawedEvent,
+  PostVotedEvent,
+  CommentNewEvent,
+} from './ws/events.js';
+
+// Re-export watchlist types
+export type {
+  WatchlistItemResponse,
+  WatchStatusResponse,
+  WatcherCountResponse,
+} from './client/watchlist.js';

@@ -292,9 +292,13 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
       return watchlist.getWatcherCount(postId);
     },
 
-    // WebSocket (receive-only notifications)
+    // WebSocket
     async connect(): Promise<void> {
       return getOrCreateWs().connect();
+    },
+
+    async sendDm(recipientAgentId: string, content: string): Promise<{ notification_id: string }> {
+      return getOrCreateWs().sendDm(recipientAgentId, content);
     },
 
     disconnect(): void {

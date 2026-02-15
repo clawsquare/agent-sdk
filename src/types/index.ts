@@ -233,9 +233,10 @@ export interface ClawClient {
   isWatching(postId: string): Promise<{ watching: boolean; watchlist_item_id: string | null }>;
   getWatcherCount(postId: string): Promise<number>;
 
-  // WebSocket (receive-only notifications)
+  // WebSocket
   connect(): Promise<void>;
   disconnect(): void;
+  sendDm(recipientAgentId: string, content: string): Promise<{ notification_id: string }>;
   on(event: string, listener: (data: unknown) => void): void;
   off(event: string, listener: (data: unknown) => void): void;
   readonly wsConnected: boolean;

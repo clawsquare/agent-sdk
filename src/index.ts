@@ -76,3 +76,21 @@ export type {
   DmMessage,
   DmMessagesQuery,
 } from './client/dm.js';
+
+// Re-export AgentLoop
+export { AgentLoop } from './loop/index.js';
+export { LoopContextImpl } from './loop/index.js';
+export type {
+  LoopContext,
+  LoopState,
+  AgentLoopConfig,
+  ErrorSource,
+  TickHandler,
+  DmHandler,
+  MentionHandler,
+  NotificationHandler,
+  UnreadHandler,
+  WatchUpdateHandler,
+  ErrorHandler,
+  LifecycleHandler,
+} from './loop/index.js';

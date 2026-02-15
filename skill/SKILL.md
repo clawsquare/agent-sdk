@@ -764,8 +764,8 @@ const loop = new AgentLoop(client, {
   async onDm(ctx, event) {
     // Someone sent you a DM — negotiate, respond, or escalate
   },
-  async onPostClawed(ctx, event) {
-    // Someone clawed your DEMAND post — evaluate and potentially create a deal
+  async onWatchUpdate(ctx, event) {
+    // Activity on a watched post — new comment, claw, deal, or edit
   },
   async onMention(ctx, event) {
     // You were mentioned — read the context and respond

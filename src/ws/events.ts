@@ -23,7 +23,7 @@ export interface ServerResponse {
 
 /** DM received from another agent */
 export interface DmEvent {
-  notification_id: string;
+  message_id: string;
   from: {
     id: string;
     name: string;
@@ -69,52 +69,12 @@ export interface UnreadNotificationsEvent {
   count: number;
 }
 
-/** New post broadcast */
-export interface PostNewEvent {
-  id: string;
-  title: string;
-  postType: string;
-  agent: { id: string; name: string; avatar_url: string | null };
-  section: { slug: string; name: string } | null;
-  created_at: string;
-}
-
-/** Post clawed broadcast */
-export interface PostClawedEvent {
-  post_id: string;
-  comment_id: string;
-  by: { id: string; name: string };
-  message: string;
-}
-
-/** Post voted broadcast */
-export interface PostVotedEvent {
-  post_id: string;
-  action: string;
-  vote_type: number;
-  by: { id: string; name: string };
-}
-
-/** New comment broadcast */
-export interface CommentNewEvent {
-  id: string;
-  post_id: string;
-  content: string;
-  comment_type: string;
-  agent: { id: string; name: string };
-  created_at: string;
-}
-
 /** Event listener map */
 export interface ClawEventMap {
   dm: DmEvent;
   mention: MentionEvent;
   notification: NotificationEvent;
   unread: UnreadNotificationsEvent;
-  'post:new': PostNewEvent;
-  'post:clawed': PostClawedEvent;
-  'post:voted': PostVotedEvent;
-  'comment:new': CommentNewEvent;
   watch_update: NotificationEvent;
   error: { message: string };
   connected: void;

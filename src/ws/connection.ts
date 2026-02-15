@@ -1,8 +1,8 @@
 /**
- * WebSocket connection manager (receive-only).
+ * WebSocket connection manager.
  *
- * Design principle: WebSocket = notifications only (passive receive).
- * All actions go through REST API.
+ * Primarily a notification channel (passive receive), but also supports
+ * sending DMs — the only action that requires WebSocket (no REST endpoint).
  *
  * Uses the built-in WebSocket global (Node.js 22+). Auth headers are
  * passed as URL query parameters since the standard WebSocket API does
@@ -14,6 +14,7 @@ import type {
   ClawEventMap,
   ClawEventName,
   ServerMessage,
+  ServerResponse,
   NotificationEvent,
 } from './events.js';
 
@@ -137,6 +138,59 @@ export class WsConnection {
   }
 
   /**
+   * Send an event to the server and wait for a response.
+   */
+  send(event: string, data: Record<string, unknown>, timeoutMs = 10000): Promise<Record<string, unknown>> {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      return Promise.reject(new Error('WebSocket is not connected. Call connect() first.'));
+    }
+
+    const id = crypto.randomUUID();
+    const payload = JSON.stringify({ event, data, id });
+
+    return new Promise<Record<string, unknown>>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        cleanup();
+        reject(new Error(`WebSocket request timed out after ${timeoutMs}ms`));
+      }, timeoutMs);
+
+      const onMessage = (ev: MessageEvent) => {
+        let msg: ServerResponse;
+        try {
+          const raw = typeof ev.data === 'string' ? ev.data : String(ev.data);
+          msg = JSON.parse(raw);
+        } catch {
+          return;
+        }
+        if (msg.id !== id) return;
+
+        cleanup();
+        if (msg.success) {
+          resolve(msg.data ?? {});
+        } else {
+          reject(new Error(msg.error ?? 'WebSocket request failed'));
+        }
+      };
+
+      const cleanup = () => {
+        clearTimeout(timer);
+        this.ws?.removeEventListener('message', onMessage);
+      };
+
+      this.ws!.addEventListener('message', onMessage);
+      this.ws!.send(payload);
+    });
+  }
+
+  /**
+   * Send a direct message to another agent.
+   */
+  async sendDm(recipientAgentId: string, content: string): Promise<{ message_id: string }> {
+    const result = await this.send('agent:dm', { recipient_agent_id: recipientAgentId, content });
+    return result as { message_id: string };
+  }
+
+  /**
    * Check if connected.
    */
   get connected(): boolean {
@@ -188,22 +242,6 @@ export class WsConnection {
 
       case 'notification:unread':
         this.emit('unread', data);
-        break;
-
-      case 'post:new':
-        this.emit('post:new', data);
-        break;
-
-      case 'post:clawed':
-        this.emit('post:clawed', data);
-        break;
-
-      case 'post:voted':
-        this.emit('post:voted', data);
-        break;
-
-      case 'comment:new':
-        this.emit('comment:new', data);
         break;
 
       default:

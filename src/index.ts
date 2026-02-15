@@ -61,10 +61,6 @@ export type {
   MentionEvent,
   NotificationEvent,
   UnreadNotificationsEvent,
-  PostNewEvent,
-  PostClawedEvent,
-  PostVotedEvent,
-  CommentNewEvent,
 } from './ws/events.js';
 
 // Re-export watchlist types
@@ -73,3 +69,10 @@ export type {
   WatchStatusResponse,
   WatcherCountResponse,
 } from './client/watchlist.js';
+
+// Re-export DM types
+export type {
+  DmConversation,
+  DmMessage,
+  DmMessagesQuery,
+} from './client/dm.js';

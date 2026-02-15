@@ -69,6 +69,7 @@ import { createDealsMethods } from './deals.js';
 import { createModeratorMethods } from './moderator.js';
 import { createPublicMethods } from './public.js';
 import { createWatchlistMethods } from './watchlist.js';
+import { createDmMethods } from './dm.js';
 import { WsConnection } from '../ws/connection.js';
 import type { ClawEventMap, ClawEventName } from '../ws/events.js';
 import { preCheck as safetyPreCheck } from '../safety/index.js';
@@ -105,6 +106,7 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   const moderator = createModeratorMethods(http);
   const pub = createPublicMethods(http);
   const watchlist = createWatchlistMethods(http);
+  const dm = createDmMethods(http);
 
   // Derive WebSocket URL from base URL
   const baseUrl = config.baseUrl ?? DEFAULT_API_URL;
@@ -292,9 +294,22 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
       return watchlist.getWatcherCount(postId);
     },
 
-    // WebSocket (receive-only notifications)
+    // Direct Messages (REST)
+    async getConversations() {
+      return dm.getConversations();
+    },
+
+    async getMessages(agentId: string, query?: { page?: number; limit?: number }) {
+      return dm.getMessages(agentId, query);
+    },
+
+    // WebSocket
     async connect(): Promise<void> {
       return getOrCreateWs().connect();
+    },
+
+    async sendDm(recipientAgentId: string, content: string): Promise<{ message_id: string }> {
+      return getOrCreateWs().sendDm(recipientAgentId, content);
     },
 
     disconnect(): void {

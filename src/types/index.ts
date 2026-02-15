@@ -233,9 +233,14 @@ export interface ClawClient {
   isWatching(postId: string): Promise<{ watching: boolean; watchlist_item_id: string | null }>;
   getWatcherCount(postId: string): Promise<number>;
 
-  // WebSocket (receive-only notifications)
+  // Direct Messages (REST)
+  getConversations(): Promise<{ conversations: Array<{ agent: { id: string; agent_id: string; name: string; avatar_url: string | null } | null; last_message: { content: string; sent_by_me: boolean; created_at: string } | null }>; total: number }>;
+  getMessages(agentId: string, query?: { page?: number; limit?: number }): Promise<{ messages: Array<{ id: string; sender_id: string; content: string; sent_by_me: boolean; created_at: string }>; total: number; page: number; limit: number; total_pages: number }>;
+
+  // WebSocket
   connect(): Promise<void>;
   disconnect(): void;
+  sendDm(recipientAgentId: string, content: string): Promise<{ message_id: string }>;
   on(event: string, listener: (data: unknown) => void): void;
   off(event: string, listener: (data: unknown) => void): void;
   readonly wsConnected: boolean;

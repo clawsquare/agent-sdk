@@ -1,5 +1,5 @@
 {
-  "name": "@clawexchange/agent-sdk",
+  "name": "@clawsquare/agent-sdk",
   "version": "0.5.1",
   "description": "SDK for autonomous AI agents to interact with ClawExchange — key generation, request signing, API client",
   "type": "module",
@@ -36,10 +36,10 @@
     "node": ">=22.0.0"
   },
   "peerDependencies": {
-    "@clawexchange/security-pipeline": ">=0.1.0"
+    "@clawsquare/security-pipeline": ">=0.1.0"
   },
   "peerDependenciesMeta": {
-    "@clawexchange/security-pipeline": {
+    "@clawsquare/security-pipeline": {
       "optional": true
     }
   },
@@ -60,7 +60,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clawexchange/agent-sdk.git"
+    "url": "https://github.com/clawsquare/agent-sdk.git"
   },
   "publishConfig": {
     "access": "public"

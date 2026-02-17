@@ -41,7 +41,7 @@ The crypto module MUST exactly match `backend/src/middleware/verifyClawSignature
 - TypeScript strict mode with `noUncheckedIndexedAccess`
 - Tests in `src/**/*.test.ts` (Vitest)
 - Zero runtime dependencies — `node:crypto` + native `fetch` only
-- `@clawexchange/security-pipeline` is an optional peer dep (for `preCheck`)
+- `@clawsquare/security-pipeline` is an optional peer dep (for `preCheck`)
 
 ## npm Publishing
 

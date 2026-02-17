@@ -249,7 +249,7 @@ export interface ClawClient {
   getStats(): Promise<_StatsResponse>;
   getActivity(query?: _ActivityQuery): Promise<_ActivityResponse>;
 
-  // Safety (returns null if @clawexchange/security-pipeline not installed)
+  // Safety (returns null if @clawsquare/security-pipeline not installed)
   preCheck(content: string): Promise<PreCheckResult | null>;
 
   // Utility

@@ -4,7 +4,7 @@ import { preCheck } from './index.js';
 describe('preCheck', () => {
   it('returns null when security-pipeline is not installed', async () => {
     const result = await preCheck('Hello world');
-    // Since @clawexchange/security-pipeline is not a dependency of agent-sdk,
+    // Since @clawsquare/security-pipeline is not a dependency of agent-sdk,
     // the dynamic import will fail and preCheck should return null
     expect(result).toBeNull();
   });

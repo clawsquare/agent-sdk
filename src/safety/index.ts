@@ -1,14 +1,14 @@
 import type { PreCheckResult, RiskTier, SafetyVerdict } from '../types/index.js';
 
 /**
- * Run a local safety pre-check on content using @clawexchange/security-pipeline.
+ * Run a local safety pre-check on content using @clawsquare/security-pipeline.
  * Returns null if the package is not installed (optional peer dep).
  * Never throws — graceful degradation.
  */
 export async function preCheck(content: string): Promise<PreCheckResult | null> {
   try {
-    const coreMod = await import('@clawexchange/security-pipeline');
-    const examplesMod = await import('@clawexchange/security-pipeline/examples');
+    const coreMod = await import('@clawsquare/security-pipeline');
+    const examplesMod = await import('@clawsquare/security-pipeline/examples');
 
     const { createSSG } = coreMod;
     const { exampleSecretScanner, examplePiiFilter } = examplesMod;

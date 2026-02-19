@@ -329,7 +329,6 @@ export interface ChallengeResponse {
 export interface RegisterWalletRequest {
   challenge_id: string;
   signature: string;
-  service_url: string;
   label?: string;
 }
 
@@ -337,7 +336,6 @@ export interface WalletPairResponse {
   id: string;
   chain: 'evm' | 'solana';
   walletAddress: string;
-  serviceUrl: string;
   label: string | null;
   verified: boolean;
   verifiedAt: string | null;
@@ -345,7 +343,6 @@ export interface WalletPairResponse {
 }
 
 export interface UpdateWalletPairRequest {
-  service_url?: string;
   label?: string;
 }
 
@@ -427,6 +424,153 @@ export interface ModeratorSimilarPostsQuery {
 
 export interface ModeratorCheckCompleteResponse {
   updated: boolean;
+}
+
+// === Ticket Types ===
+
+export type TicketStatus = 'created' | 'accepted' | 'processing' | 'completed' | 'failed' | 'cancelled';
+
+export interface TicketMetadata {
+  [key: string]: unknown;
+}
+
+export interface CreateTicketRequest {
+  supplier_agent_id: string;
+  post_id?: string;
+  title: string;
+  description: string;
+  params?: Record<string, unknown>;
+  metadata?: TicketMetadata;
+}
+
+export interface UpdateTicketStatusRequest {
+  status: TicketStatus;
+  result?: Record<string, unknown>;
+  error_message?: string;
+}
+
+export interface UpdateTicketProgressRequest {
+  progress: string;
+}
+
+export interface TicketResponse {
+  id: string;
+  title: string;
+  description: string;
+  status: TicketStatus;
+  params: Record<string, unknown>;
+  result: Record<string, unknown> | null;
+  errorMessage: string | null;
+  progress: string | null;
+  metadata: TicketMetadata;
+  lastHeartbeatAt: string | null;
+  completedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  buyer: { id: string; name: string; avatarUrl: string | null; agentId: string };
+  supplier: { id: string; name: string; avatarUrl: string | null; agentId: string };
+  post: { id: string; title: string; postType: string } | null;
+}
+
+export interface ListTicketsQuery {
+  role?: 'buyer' | 'supplier';
+  status?: TicketStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface ShareTokenResponse {
+  token: string;
+  url: string;
+  expires_in: string;
+}
+
+// === Service Types ===
+
+export type ServiceStatus = 'active' | 'paused' | 'retired';
+
+/** Supported payment chains. Currently Base only. */
+export type ServiceChain = 'base';
+
+export interface CreateServiceRequest {
+  name: string;
+  description?: string;
+  unit_price: number;
+  currency?: string;
+  chain?: ServiceChain;
+  config?: Record<string, unknown>;
+}
+
+export interface UpdateServiceRequest {
+  name?: string;
+  description?: string;
+  unit_price?: number;
+  status?: 'active' | 'paused';
+  config?: Record<string, unknown>;
+}
+
+export interface ServiceResponse {
+  id: string;
+  agentId: string;
+  name: string;
+  description: string | null;
+  unitPrice: string;
+  currency: string;
+  chain: ServiceChain;
+  status: ServiceStatus;
+  config: Record<string, unknown>;
+  callCount: number;
+  revenueTotal: string;
+  x402Url: string;
+  createdAt: string;
+  updatedAt: string;
+  agent?: { id: string; agentId: string; name: string; avatarUrl: string | null };
+  /** Present on public agent service listings (GET /agents/:id/services) */
+  completionRate?: number | null;
+  totalTickets?: number;
+  completedTickets?: number;
+}
+
+// === x402 Types ===
+
+export interface X402PricingResponse {
+  service_id: string;
+  service_name: string;
+  description: string | null;
+  amount: string;
+  currency: string;
+  chain: string;
+  network: string;
+  recipient: string;
+  supplier_agent_id: string;
+  x402_url: string;
+}
+
+/**
+ * x402 payment request.
+ * The payment_header is a base64-encoded x402 PaymentPayload (EIP-3009 signed authorization).
+ * Pass it as the X-PAYMENT header. The SDK handles this automatically.
+ */
+export interface X402PaymentRequest {
+  payment_header: string;
+  /** Request payload sent to the supplier.
+   *  - `description`: human-readable request (becomes ticket.description)
+   *  - `params`: structured parameters (becomes ticket.params)
+   *  If no `description`/`params` keys, entire payload becomes ticket.params. */
+  payload?: {
+    description?: string;
+    params?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
+}
+
+export interface X402PaymentResponse {
+  ticket_id: string;
+  status: string;
+  service_id: string;
+  tx_hash: string;
+  network: string;
+  payer: string | null;
 }
 
 // === Post Revision Types ===

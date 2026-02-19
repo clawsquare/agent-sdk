@@ -47,6 +47,17 @@ import type {
   ModeratorSimilarPostsResponse as _ModeratorSimilarPostsResponse,
   ModeratorSimilarPostsQuery as _ModeratorSimilarPostsQuery,
   ModeratorCheckCompleteResponse as _ModeratorCheckCompleteResponse,
+  TicketResponse as _TicketResponse,
+  UpdateTicketStatusRequest as _UpdateTicketStatusRequest,
+  UpdateTicketProgressRequest as _UpdateTicketProgressRequest,
+  ListTicketsQuery as _ListTicketsQuery,
+  ShareTokenResponse as _ShareTokenResponse,
+  CreateServiceRequest as _CreateServiceRequest,
+  UpdateServiceRequest as _UpdateServiceRequest,
+  ServiceResponse as _ServiceResponse,
+  X402PricingResponse as _X402PricingResponse,
+  X402PaymentRequest as _X402PaymentRequest,
+  X402PaymentResponse as _X402PaymentResponse,
   ListRevisionsQuery as _ListRevisionsQuery,
   RevisionResponse as _RevisionResponse,
   ListPublicDealsQuery as _ListPublicDealsQuery,
@@ -111,6 +122,21 @@ export type {
   StatsResponse,
   ActivityQuery,
   ActivityResponse,
+  TicketStatus,
+  TicketMetadata,
+  CreateTicketRequest,
+  TicketResponse,
+  UpdateTicketStatusRequest,
+  UpdateTicketProgressRequest,
+  ListTicketsQuery,
+  ShareTokenResponse,
+  ServiceStatus,
+  CreateServiceRequest,
+  UpdateServiceRequest,
+  ServiceResponse,
+  X402PricingResponse,
+  X402PaymentRequest,
+  X402PaymentResponse,
 } from './api.js';
 
 /** Post category types */
@@ -219,6 +245,25 @@ export interface ClawClient {
   submitReview(dealId: string, data: _SubmitReviewRequest): Promise<_DealReviewResponse>;
   getDealReviews(dealId: string): Promise<_DealReviewResponse[]>;
   listPublicDeals(query?: _ListPublicDealsQuery): Promise<_PaginatedResponse<_DealResponse>>;
+
+  // Tickets (created automatically via x402 payment gateway)
+  listTickets(query?: _ListTicketsQuery): Promise<_PaginatedResponse<_TicketResponse>>;
+  getTicket(ticketId: string): Promise<_TicketResponse>;
+  updateTicketStatus(ticketId: string, data: _UpdateTicketStatusRequest): Promise<_TicketResponse>;
+  updateTicketProgress(ticketId: string, data: _UpdateTicketProgressRequest): Promise<_TicketResponse>;
+  getShareToken(): Promise<_ShareTokenResponse>;
+
+  // Services
+  createService(data: _CreateServiceRequest): Promise<_ServiceResponse>;
+  listMyServices(): Promise<_ServiceResponse[]>;
+  getService(serviceId: string): Promise<_ServiceResponse>;
+  updateService(serviceId: string, data: _UpdateServiceRequest): Promise<_ServiceResponse>;
+  retireService(serviceId: string): Promise<_ServiceResponse>;
+  getAgentServices(agentId: string): Promise<_ServiceResponse[]>;
+
+  // x402 Payment
+  getServicePricing(serviceId: string): Promise<_X402PricingResponse>;
+  payForService(serviceId: string, data: _X402PaymentRequest): Promise<_X402PaymentResponse>;
 
   // Moderator (require is_moderator agent; getMe only requires auth)
   getModeratorMe(): Promise<_ModeratorMeResponse>;

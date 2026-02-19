@@ -75,7 +75,6 @@ describe('wallets methods', () => {
       id: 'wp-1',
       chain: 'evm',
       wallet_address: '0xabc123',
-      service_url: 'https://pay.example.com',
       label: null,
       verified: true,
       verified_at: '2026-02-07T12:00:00Z',
@@ -89,7 +88,6 @@ describe('wallets methods', () => {
     const result = await wallets.registerWallet({
       challenge_id: 'ch-1',
       signature: 'sig-abc',
-      service_url: 'https://pay.example.com',
     });
 
     const [url, init] = fetchMock.mock.calls[0]!;
@@ -98,14 +96,13 @@ describe('wallets methods', () => {
     const body = JSON.parse(init.body as string);
     expect(body.challenge_id).toBe('ch-1');
     expect(body.signature).toBe('sig-abc');
-    expect(body.service_url).toBe('https://pay.example.com');
     expect(init.headers['X-Claw-Agent-ID']).toBeDefined();
     expect(result.id).toBe('wp-1');
   });
 
   it('listMyWallets sends GET /wallets with optional status query', async () => {
     const walletList = [
-      { id: 'wp-1', chain: 'evm', wallet_address: '0xabc', service_url: 'https://pay.example.com', label: null, verified: true, verified_at: '2026-02-07T12:00:00Z', status: 'active' },
+      { id: 'wp-1', chain: 'evm', wallet_address: '0xabc', label: null, verified: true, verified_at: '2026-02-07T12:00:00Z', status: 'active' },
     ];
     const fetchMock = mockFetch({ success: true, data: walletList });
     globalThis.fetch = fetchMock;
@@ -128,7 +125,6 @@ describe('wallets methods', () => {
       id: 'wp-1',
       chain: 'evm',
       wallet_address: '0xabc123',
-      service_url: 'https://pay.example.com',
       label: 'primary',
       verified: true,
       verified_at: '2026-02-07T12:00:00Z',
@@ -154,7 +150,6 @@ describe('wallets methods', () => {
       id: 'wp-1',
       chain: 'evm',
       wallet_address: '0xabc123',
-      service_url: 'https://new-pay.example.com',
       label: 'updated',
       verified: true,
       verified_at: '2026-02-07T12:00:00Z',
@@ -166,7 +161,6 @@ describe('wallets methods', () => {
     const http = await createAuthHttp();
     const wallets = createWalletsMethods(http);
     const result = await wallets.updateWalletPair('wp-1', {
-      service_url: 'https://new-pay.example.com',
       label: 'updated',
     });
 
@@ -174,7 +168,6 @@ describe('wallets methods', () => {
     expect(url).toContain('/wallets/wp-1');
     expect(init.method).toBe('PATCH');
     const body = JSON.parse(init.body as string);
-    expect(body.service_url).toBe('https://new-pay.example.com');
     expect(body.label).toBe('updated');
     expect(init.headers['X-Claw-Agent-ID']).toBeDefined();
     expect(result.label).toBe('updated');
@@ -185,7 +178,6 @@ describe('wallets methods', () => {
       id: 'wp-1',
       chain: 'evm',
       wallet_address: '0xabc123',
-      service_url: 'https://pay.example.com',
       label: null,
       verified: true,
       verified_at: '2026-02-07T12:00:00Z',
@@ -207,7 +199,7 @@ describe('wallets methods', () => {
 
   it('verifyAgentWallets sends GET /agents/:agentId/wallets without auth', async () => {
     const walletList = [
-      { id: 'wp-1', chain: 'evm', wallet_address: '0xabc', service_url: 'https://pay.example.com', label: null, verified: true, verified_at: '2026-02-07T12:00:00Z', status: 'active' },
+      { id: 'wp-1', chain: 'evm', wallet_address: '0xabc', label: null, verified: true, verified_at: '2026-02-07T12:00:00Z', status: 'active' },
     ];
     const fetchMock = mockFetch({ success: true, data: walletList });
     globalThis.fetch = fetchMock;

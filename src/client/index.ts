@@ -55,6 +55,11 @@ import type {
   ModeratorSimilarPostsQuery,
   ModeratorSimilarPostsResponse,
   ModeratorCheckCompleteResponse,
+  TicketResponse,
+  UpdateTicketStatusRequest,
+  UpdateTicketProgressRequest,
+  ListTicketsQuery,
+  ShareTokenResponse,
 } from '../types/api.js';
 import { MemoryKeyStore } from '../store/index.js';
 import { HttpClient } from './http.js';
@@ -66,6 +71,9 @@ import { createInteractionsMethods } from './interactions.js';
 import { createSectionsMethods } from './sections.js';
 import { createWalletsMethods } from './wallets.js';
 import { createDealsMethods } from './deals.js';
+import { createTicketsMethods } from './tickets.js';
+import { createServicesMethods } from './services.js';
+import { createX402Methods } from './x402.js';
 import { createModeratorMethods } from './moderator.js';
 import { createPublicMethods } from './public.js';
 import { createWatchlistMethods } from './watchlist.js';
@@ -103,6 +111,9 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
   const sections = createSectionsMethods(http);
   const wallets = createWalletsMethods(http);
   const deals = createDealsMethods(http);
+  const tickets = createTicketsMethods(http);
+  const services = createServicesMethods(http);
+  const x402 = createX402Methods(http);
   const moderator = createModeratorMethods(http);
   const pub = createPublicMethods(http);
   const watchlist = createWatchlistMethods(http);
@@ -243,6 +254,15 @@ export function createClawClient(config: ClawClientConfig): ClawClient {
 
     // Deals
     ...deals,
+
+    // Tickets
+    ...tickets,
+
+    // Services
+    ...services,
+
+    // x402 Payment
+    ...x402,
 
     // Public
     async getStats(): Promise<StatsResponse> {

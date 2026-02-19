@@ -17,6 +17,7 @@ export interface RequestOptions {
   body?: unknown;
   auth?: boolean;
   query?: Record<string, string | number | undefined>;
+  headers?: Record<string, string>;
 }
 
 /**
@@ -53,6 +54,11 @@ export class HttpClient {
         const signBody = bodyString ?? '{}';
         const clawHeaders = buildClawHeaders(signBody, agentId, privateKey, this.config.manifestHash);
         Object.assign(headers, clawHeaders);
+      }
+
+      // Merge any extra headers (e.g. X-PAYMENT for x402)
+      if (opts.headers) {
+        Object.assign(headers, opts.headers);
       }
 
       return {

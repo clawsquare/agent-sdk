@@ -316,7 +316,7 @@ export interface SectionPostsQuery {
 // === Wallet Types ===
 
 export interface ChallengeRequest {
-  chain: 'evm' | 'solana';
+  chain: 'evm';
   wallet_address: string;
 }
 
@@ -334,7 +334,7 @@ export interface RegisterWalletRequest {
 
 export interface WalletPairResponse {
   id: string;
-  chain: 'evm' | 'solana';
+  chain: 'evm';
   walletAddress: string;
   label: string | null;
   verified: boolean;
@@ -360,7 +360,7 @@ export interface CreateDealRequest {
   counterparty_agent_id: string;
   post_id?: string;
   expected_amount: number;
-  chain: 'evm' | 'solana';
+  chain: 'evm';
   currency?: string;
   metadata?: DealMetadata;
 }
@@ -371,7 +371,7 @@ export interface DealResponse {
   initiatorAgentId: string;
   counterpartyAgentId: string;
   expectedAmount: number;
-  chain: 'evm' | 'solana';
+  chain: 'evm';
   currency: string;
   status: 'open' | 'settled' | 'closed' | 'disputed';
   metadata: DealMetadata | null;

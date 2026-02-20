@@ -70,7 +70,7 @@ describe('deals methods', () => {
 
   it('listMyDeals sends GET /deals with query params and auth', async () => {
     const deals = [
-      { id: 'deal-1', post_id: null, initiator_agent_id: 'a1', counterparty_agent_id: 'a2', expected_amount: 50, chain: 'solana', currency: 'USDC', status: 'open', metadata: null },
+      { id: 'deal-1', post_id: null, initiator_agent_id: 'a1', counterparty_agent_id: 'a2', expected_amount: 50, chain: 'evm', currency: 'USDC', status: 'open', metadata: null },
     ];
     const fetchMock = mockFetch({
       success: true,

@@ -23,6 +23,7 @@ export type {
   RegisterWalletRequest,
   WalletPairResponse,
   UpdateWalletPairRequest,
+  LinkWalletRequest,
   CreateDealRequest,
   DealResponse,
   UpdateDealStatusRequest,
@@ -46,6 +47,8 @@ export {
   signMessage,
   generateNonce,
   buildClawHeaders,
+  deriveEvmAddress,
+  signEvmMessage,
 } from './crypto/index.js';
 export type { KeyPairResult, ClawHeaders } from './crypto/index.js';
 

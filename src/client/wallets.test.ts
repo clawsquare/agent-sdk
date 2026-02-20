@@ -3,6 +3,7 @@ import { HttpClient } from './http.js';
 import { MemoryKeyStore } from '../store/index.js';
 import { generateKeyPair } from '../crypto/keys.js';
 import { createWalletsMethods } from './wallets.js';
+import { deriveEvmAddress } from '../crypto/evm.js';
 
 function mockFetch(body: unknown, status = 200) {
   return vi.fn().mockResolvedValue({
@@ -120,7 +121,7 @@ describe('wallets methods', () => {
     expect(result[0]!.id).toBe('wp-1');
   });
 
-  it('getWalletPair sends GET /wallets/:pairId without auth', async () => {
+  it('getWalletPair sends GET /wallets/pair/:pairId without auth', async () => {
     const walletPair = {
       id: 'wp-1',
       chain: 'evm',
@@ -138,14 +139,14 @@ describe('wallets methods', () => {
     const result = await wallets.getWalletPair('wp-1');
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toContain('/wallets/wp-1');
+    expect(url).toContain('/wallets/pair/wp-1');
     expect(init.method).toBe('GET');
     expect(init.headers['X-Claw-Agent-ID']).toBeUndefined();
     expect(result.id).toBe('wp-1');
     expect(result.label).toBe('primary');
   });
 
-  it('updateWalletPair sends PATCH /wallets/:pairId with body and auth', async () => {
+  it('updateWalletPair sends PATCH /wallets/pair/:pairId with body and auth', async () => {
     const updated = {
       id: 'wp-1',
       chain: 'evm',
@@ -165,7 +166,7 @@ describe('wallets methods', () => {
     });
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toContain('/wallets/wp-1');
+    expect(url).toContain('/wallets/pair/wp-1');
     expect(init.method).toBe('PATCH');
     const body = JSON.parse(init.body as string);
     expect(body.label).toBe('updated');
@@ -173,7 +174,7 @@ describe('wallets methods', () => {
     expect(result.label).toBe('updated');
   });
 
-  it('revokeWalletPair sends DELETE /wallets/:pairId with auth', async () => {
+  it('revokeWalletPair sends DELETE /wallets/pair/:pairId with auth', async () => {
     const revoked = {
       id: 'wp-1',
       chain: 'evm',
@@ -191,7 +192,7 @@ describe('wallets methods', () => {
     const result = await wallets.revokeWalletPair('wp-1');
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toContain('/wallets/wp-1');
+    expect(url).toContain('/wallets/pair/wp-1');
     expect(init.method).toBe('DELETE');
     expect(init.headers['X-Claw-Agent-ID']).toBeDefined();
     expect(result.status).toBe('revoked');
@@ -213,5 +214,64 @@ describe('wallets methods', () => {
     expect(init.method).toBe('GET');
     expect(init.headers['X-Claw-Agent-ID']).toBeUndefined();
     expect(result).toHaveLength(1);
+  });
+
+  it('linkWallet calls challenge then register with correct EIP-191 signature', async () => {
+    const testKey = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+    const expectedAddress = deriveEvmAddress(testKey);
+    const challengeMessage = 'ClawSquare wallet verification: test-nonce for agent abc';
+
+    // Mock two sequential fetch calls: challenge → register
+    let callCount = 0;
+    const fetchMock = vi.fn().mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        // Challenge response
+        return Promise.resolve({
+          ok: true, status: 200, statusText: 'OK', headers: new Headers(),
+          json: () => Promise.resolve({
+            success: true,
+            data: { challengeId: 'ch-99', message: challengeMessage, expiresAt: '2026-02-20T12:00:00Z' },
+          }),
+        });
+      }
+      // Register response
+      return Promise.resolve({
+        ok: true, status: 200, statusText: 'OK', headers: new Headers(),
+        json: () => Promise.resolve({
+          success: true,
+          data: { id: 'wp-99', chain: 'evm', walletAddress: expectedAddress, label: 'test', verified: true, verifiedAt: '2026-02-20T12:00:00Z', status: 'active' },
+        }),
+      });
+    });
+    globalThis.fetch = fetchMock;
+
+    const http = await createAuthHttp();
+    const wallets = createWalletsMethods(http);
+    const result = await wallets.linkWallet({ private_key: testKey, label: 'test' });
+
+    // Verify two fetch calls were made
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    // First call: POST /wallets/challenge with derived address
+    const [challengeUrl, challengeInit] = fetchMock.mock.calls[0]!;
+    expect(challengeUrl).toContain('/wallets/challenge');
+    expect(challengeInit.method).toBe('POST');
+    const challengeBody = JSON.parse(challengeInit.body as string);
+    expect(challengeBody.chain).toBe('evm');
+    expect(challengeBody.wallet_address.toLowerCase()).toBe(expectedAddress.toLowerCase());
+
+    // Second call: POST /wallets/register with signature
+    const [registerUrl, registerInit] = fetchMock.mock.calls[1]!;
+    expect(registerUrl).toContain('/wallets/register');
+    expect(registerInit.method).toBe('POST');
+    const registerBody = JSON.parse(registerInit.body as string);
+    expect(registerBody.challenge_id).toBe('ch-99');
+    expect(registerBody.signature).toMatch(/^0x[0-9a-f]{130}$/); // 65-byte hex sig
+    expect(registerBody.label).toBe('test');
+
+    // Result
+    expect(result.id).toBe('wp-99');
+    expect(result.walletAddress.toLowerCase()).toBe(expectedAddress.toLowerCase());
   });
 });

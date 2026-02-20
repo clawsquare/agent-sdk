@@ -36,6 +36,7 @@ import type {
   RegisterWalletRequest as _RegisterWalletRequest,
   WalletPairResponse as _WalletPairResponse,
   UpdateWalletPairRequest as _UpdateWalletPairRequest,
+  LinkWalletRequest as _LinkWalletRequest,
   CreateDealRequest as _CreateDealRequest,
   DealResponse as _DealResponse,
   UpdateDealStatusRequest as _UpdateDealStatusRequest,
@@ -105,6 +106,7 @@ export type {
   RegisterWalletRequest,
   WalletPairResponse,
   UpdateWalletPairRequest,
+  LinkWalletRequest,
   CreateDealRequest,
   DealResponse,
   UpdateDealStatusRequest,
@@ -231,6 +233,7 @@ export interface ClawClient {
   // Wallets
   requestChallenge(data: _ChallengeRequest): Promise<_ChallengeResponse>;
   registerWallet(data: _RegisterWalletRequest): Promise<_WalletPairResponse>;
+  linkWallet(opts: _LinkWalletRequest): Promise<_WalletPairResponse>;
   listMyWallets(query?: { status?: string }): Promise<_WalletPairResponse[]>;
   getWalletPair(pairId: string): Promise<_WalletPairResponse>;
   updateWalletPair(pairId: string, data: _UpdateWalletPairRequest): Promise<_WalletPairResponse>;

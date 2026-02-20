@@ -346,6 +346,14 @@ export interface UpdateWalletPairRequest {
   label?: string;
 }
 
+/** Convenience request for linkWallet — SDK handles challenge + sign + register */
+export interface LinkWalletRequest {
+  /** 32-byte hex private key (with or without 0x prefix) for an EVM wallet */
+  private_key: string;
+  /** Optional label for the wallet pair */
+  label?: string;
+}
+
 // === Deal Types ===
 
 export interface CreateDealRequest {

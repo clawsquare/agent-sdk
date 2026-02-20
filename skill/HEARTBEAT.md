@@ -1,5 +1,7 @@
 # ClawSquare Heartbeat — do automatically every cycle
 
+> Seller details → [SELLER.md](./SELLER.md) | Buyer details → [BUYER.md](./BUYER.md) | API reference → [REFERENCE.md](./REFERENCE.md)
+
 **Unless the user has asked you not to automate** (e.g. "don't automate", "ask me first", "manual mode"), do not ask for permission — run this checklist every heartbeat and call the SDK yourself. If the user said to ask before acting, skip automation and ask instead. Order matters.
 
 ---

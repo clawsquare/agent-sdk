@@ -1,5 +1,5 @@
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { keccak_256 } from '@noble/hashes/sha3';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { keccak_256 } from '@noble/hashes/sha3.js';
 
 /**
  * Derive an EVM wallet address from a secp256k1 private key.
@@ -8,8 +8,8 @@ import { keccak_256 } from '@noble/hashes/sha3';
  * @returns Checksummed-lowercase 0x-prefixed address
  */
 export function deriveEvmAddress(privateKey: string): string {
-  const keyHex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
-  const pubkey = secp256k1.getPublicKey(keyHex, false); // uncompressed, 65 bytes
+  const keyBytes = hexToBytes(privateKey);
+  const pubkey = secp256k1.getPublicKey(keyBytes, false); // uncompressed, 65 bytes
   const hash = keccak_256(pubkey.subarray(1)); // skip 0x04 prefix
   const addressBytes = hash.slice(-20);
   return '0x' + Buffer.from(addressBytes).toString('hex');
@@ -26,7 +26,7 @@ export function deriveEvmAddress(privateKey: string): string {
  * @returns 0x-prefixed 130-char hex signature
  */
 export function signEvmMessage(message: string, privateKey: string): string {
-  const keyHex = privateKey.startsWith('0x') ? privateKey.slice(2) : privateKey;
+  const keyBytes = hexToBytes(privateKey);
 
   // EIP-191 prefix (must match backend exactly)
   const prefix = `\x19Ethereum Signed Message:\n${message.length}`;
@@ -36,15 +36,20 @@ export function signEvmMessage(message: string, privateKey: string): string {
   ]);
   const hash = keccak_256(prefixedMessage);
 
-  // Sign and get recovery bit
-  const sig = secp256k1.sign(hash, keyHex);
-  const compact = sig.toCompactRawBytes(); // 64 bytes (r + s)
-  const v = sig.recovery + 27; // EIP-155 style: 27 or 28
+  // Sign with recovery bit: returns [recovery(1), r(32), s(32)]
+  const sig65 = secp256k1.sign(hash, keyBytes, { format: 'recovered' });
+  const recovery = sig65[0];
+  const rs = sig65.subarray(1); // 64 bytes: r + s
 
-  // Concatenate r[32] + s[32] + v[1] = 65 bytes
+  // Rearrange to EVM format: r[32] + s[32] + v[1]  (v = recovery + 27)
   const result = new Uint8Array(65);
-  result.set(compact, 0);
-  result[64] = v;
+  result.set(rs, 0);
+  result[64] = recovery + 27;
 
   return '0x' + Buffer.from(result).toString('hex');
+}
+
+function hexToBytes(hex: string): Uint8Array {
+  const h = hex.startsWith('0x') ? hex.slice(2) : hex;
+  return Uint8Array.from(Buffer.from(h, 'hex'));
 }

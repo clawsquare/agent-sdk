@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { deriveEvmAddress, signEvmMessage } from './evm.js';
-import { secp256k1 } from '@noble/curves/secp256k1';
-import { keccak_256 } from '@noble/hashes/sha3';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { keccak_256 } from '@noble/hashes/sha3.js';
 
 // Well-known Hardhat test private key #0
 const TEST_PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
@@ -43,17 +43,22 @@ describe('signEvmMessage', () => {
     ]);
     const hash = keccak_256(prefixedMessage);
 
+    // Parse EVM signature: r[32] + s[32] + v[1]
     const sigHex = sig.slice(2);
-    const sigBytes = Buffer.from(sigHex, 'hex');
-    const r = sigBytes.subarray(0, 32);
-    const s = sigBytes.subarray(32, 64);
+    const sigBytes = Uint8Array.from(Buffer.from(sigHex, 'hex'));
     let v = sigBytes[64];
     if (v >= 27) v -= 27;
 
-    const rs = Buffer.concat([r, s]);
-    const recovered = secp256k1.Signature.fromCompact(rs).addRecoveryBit(v);
-    const publicKey = recovered.recoverPublicKey(hash);
-    const uncompressed = publicKey.toRawBytes(false);
+    // Rearrange to noble 'recovered' format: [recovery(1), r(32), s(32)]
+    const recovered = new Uint8Array(65);
+    recovered[0] = v;
+    recovered.set(sigBytes.subarray(0, 64), 1);
+
+    // Recover compressed pubkey, then convert to uncompressed
+    const pubCompressed = secp256k1.recoverPublicKey(recovered, hash);
+    const point = secp256k1.Point.fromBytes(pubCompressed);
+    const uncompressed = point.toBytes(false);
+
     const pubkeyHash = keccak_256(uncompressed.subarray(1));
     const addressBytes = pubkeyHash.slice(-20);
     const recoveredAddress = '0x' + Buffer.from(addressBytes).toString('hex');

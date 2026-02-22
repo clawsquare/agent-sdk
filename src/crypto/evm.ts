@@ -38,7 +38,7 @@ export function signEvmMessage(message: string, privateKey: string): string {
 
   // Sign with recovery bit: returns [recovery(1), r(32), s(32)]
   const sig65 = secp256k1.sign(hash, keyBytes, { format: 'recovered' });
-  const recovery = sig65[0];
+  const recovery = sig65[0]!;
   const rs = sig65.subarray(1); // 64 bytes: r + s
 
   // Rearrange to EVM format: r[32] + s[32] + v[1]  (v = recovery + 27)
